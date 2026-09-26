@@ -126,134 +126,153 @@ export function ProjectsView() {
         </div>
       )}
 
-      {/* Project Folders Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((folder) => {
-          const folderTransactions = allTransactions.filter((t) => t.projectId === folder.id);
-          const totalSpend = folderTransactions
-            .filter((t) => t.type === 'EXPENSE')
-            .reduce((sum, t) => sum + t.amount, 0);
-          const totalInflow = folderTransactions
-            .filter((t) => t.type === 'INCOME')
-            .reduce((sum, t) => sum + t.amount, 0);
-          const pct = Math.min(
-            100,
-            folder.allocatedBudget > 0
-              ? Math.round((totalSpend / folder.allocatedBudget) * 100)
-              : 0
-          );
-          const isSelected = selectedProjectId === folder.id;
+      {/* Project Folders Grid or Empty State */}
+      {projects.length === 0 ? (
+        <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white p-10 sm:p-14 text-center max-w-2xl mx-auto shadow-subtle">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-card mb-4">
+            <FolderKanban className="h-8 w-8" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900">No Project Folders Created Yet</h3>
+          <p className="text-xs text-slate-500 mt-2 leading-relaxed max-w-md mx-auto">
+            You have full control: create your own project folder first (e.g., &ldquo;Project Alpha&rdquo;, &ldquo;Q4 Logistics Expansion&rdquo;). Once created, upload your invoices CSV into that project to trigger real-time ledger analysis, budget guardrails, and cash flow insights.
+          </p>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer active:scale-[0.98]"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Create Your First Project Folder</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((folder) => {
+            const folderTransactions = allTransactions.filter((t) => t.projectId === folder.id);
+            const totalSpend = folderTransactions
+              .filter((t) => t.type === 'EXPENSE')
+              .reduce((sum, t) => sum + t.amount, 0);
+            const totalInflow = folderTransactions
+              .filter((t) => t.type === 'INCOME')
+              .reduce((sum, t) => sum + t.amount, 0);
+            const pct = Math.min(
+              100,
+              folder.allocatedBudget > 0
+                ? Math.round((totalSpend / folder.allocatedBudget) * 100)
+                : 0
+            );
+            const isSelected = selectedProjectId === folder.id;
 
-          return (
-            <div
-              key={folder.id}
-              className={`rounded-2xl bg-white p-6 shadow-subtle border transition-all flex flex-col justify-between hover:shadow-card ${
-                isSelected ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-100'
-              }`}
-            >
-              <div>
-                {/* Header: Code & Department */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                    {folder.code}
-                  </span>
-                  <span className="text-[11px] font-medium text-slate-500">
-                    {folder.department}
-                  </span>
-                </div>
-
-                {/* Folder Title & Description */}
-                <div className="flex items-start gap-3 mb-3">
-                  <div
-                    className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 text-white font-bold"
-                    style={{ backgroundColor: folder.color }}
-                  >
-                    <FolderOpen className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900 leading-snug">
-                      {folder.name}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                      {folder.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Invoices Count Chip */}
-                <div className="flex items-center justify-between text-xs py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-100 mb-4">
-                  <span className="text-slate-500 font-medium">Associated Invoices:</span>
-                  <span className="font-bold text-slate-800">
-                    {folderTransactions.length > 0 ? (
-                      `${folderTransactions.length} Invoices Ingested`
-                    ) : (
-                      <span className="text-amber-600 font-semibold">Empty Folder (0)</span>
-                    )}
-                  </span>
-                </div>
-
-                {/* Budget Utilization Meter */}
-                <div className="space-y-1.5 mb-4">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Budget Spend</span>
-                    <span className="font-bold text-slate-900 tabular-nums">
-                      {formatCurrency(totalSpend, user.currency)} /{' '}
-                      {formatCurrency(folder.allocatedBudget, user.currency)}
+            return (
+              <div
+                key={folder.id}
+                className={`rounded-2xl bg-white p-6 shadow-subtle border transition-all flex flex-col justify-between hover:shadow-card ${
+                  isSelected ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-100'
+                }`}
+              >
+                <div>
+                  {/* Header: Code & Department */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                      {folder.code}
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-500">
+                      {folder.department}
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+
+                  {/* Folder Title & Description */}
+                  <div className="flex items-start gap-3 mb-3">
                     <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${pct}%`,
-                        backgroundColor: pct > 90 ? '#E11D48' : folder.color,
-                      }}
-                    />
+                      className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 text-white font-bold"
+                      style={{ backgroundColor: folder.color }}
+                    >
+                      <FolderOpen className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 leading-snug">
+                        {folder.name}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        {folder.description}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-400">
-                    <span>{pct}% Allocated</span>
-                    {totalInflow > 0 && (
-                      <span className="text-emerald-600 font-medium">
-                        +{formatCurrency(totalInflow, user.currency)} Inflow
+
+                  {/* Invoices Count Chip */}
+                  <div className="flex items-center justify-between text-xs py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-100 mb-4">
+                    <span className="text-slate-500 font-medium">Associated Invoices:</span>
+                    <span className="font-bold text-slate-800">
+                      {folderTransactions.length > 0 ? (
+                        `${folderTransactions.length} Invoices Ingested`
+                      ) : (
+                        <span className="text-amber-600 font-semibold">Empty Folder (0)</span>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Budget Utilization Meter */}
+                  <div className="space-y-1.5 mb-4">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-500 font-medium">Budget Spend</span>
+                      <span className="font-bold text-slate-900 tabular-nums">
+                        {formatCurrency(totalSpend, user.currency)} /{' '}
+                        {formatCurrency(folder.allocatedBudget, user.currency)}
                       </span>
-                    )}
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${pct}%`,
+                          backgroundColor: pct > 90 ? '#E11D48' : folder.color,
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>{pct}% Allocated</span>
+                      {totalInflow > 0 && (
+                        <span className="text-emerald-600 font-medium">
+                          +{formatCurrency(totalInflow, user.currency)} Inflow
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => handleUploadToFolder(folder.id)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-subtle"
+                    title="Upload CSV statement specifically into this folder"
+                  >
+                    <UploadCloud className="h-3.5 w-3.5 text-slate-600" />
+                    <span>Upload CSV</span>
+                  </button>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleOpenFolder(folder.id)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition-all shadow-sm active:scale-[0.98]"
+                    >
+                      <span>Open Cockpit</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => deleteProject(folder.id)}
+                      className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      title="Delete Project Folder"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                <button
-                  onClick={() => handleUploadToFolder(folder.id)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-subtle"
-                  title="Upload CSV statement specifically into this folder"
-                >
-                  <UploadCloud className="h-3.5 w-3.5 text-slate-600" />
-                  <span>Upload CSV</span>
-                </button>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => handleOpenFolder(folder.id)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition-all shadow-sm active:scale-[0.98]"
-                  >
-                    <span>Open Cockpit</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-
-                  <button
-                    onClick={() => deleteProject(folder.id)}
-                    className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                    title="Delete Project Folder"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Create Project Modal */}
       {isCreateOpen && (

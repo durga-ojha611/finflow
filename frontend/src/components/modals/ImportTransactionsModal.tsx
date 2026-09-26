@@ -385,6 +385,24 @@ export function ImportTransactionsModal() {
               </button>
             </div>
 
+            {projects.length === 0 && !isCreatingProject && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div>
+                  <p className="text-xs font-bold text-amber-900">No custom project folder created yet</p>
+                  <p className="text-[11px] text-amber-700">
+                    Create your project folder first so all uploaded invoices are mapped directly to your project workspace.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCreatingProject(true)}
+                  className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+                >
+                  + Create Project Folder
+                </button>
+              </div>
+            )}
+
             <div className="relative">
               <select
                 value={targetFolderId}

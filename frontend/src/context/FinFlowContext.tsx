@@ -20,7 +20,6 @@ import {
   INITIAL_SAVINGS_GOALS,
   INITIAL_CLAIMS,
   INITIAL_PAYROLL_RUNS,
-  INITIAL_PROJECTS,
 } from '../lib/mockData';
 
 interface FinFlowContextType {
@@ -101,7 +100,26 @@ const FinFlowContext = createContext<FinFlowContextType | undefined>(undefined);
 export function FinFlowProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [projects, setProjects] = useState<ProjectFolder[]>(INITIAL_PROJECTS);
+  const [projects, setProjects] = useState<ProjectFolder[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('finflow_custom_user_projects');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (err) {
+        console.error('Failed to load projects from localStorage:', err);
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('finflow_custom_user_projects', JSON.stringify(projects));
+    }
+  }, [projects]);
   const [selectedProjectId, setSelectedProjectId] = useState<string | 'ALL'>('ALL');
   const [dataSourceType, setDataSourceType] = useState<'empty' | 'demo' | 'csv'>('empty');
   const [csvFileName, setCsvFileName] = useState<string | null>(null);
