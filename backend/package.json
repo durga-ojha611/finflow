@@ -1,0 +1,39 @@
+{
+  "name": "finflow-ai-backend",
+  "version": "1.0.0",
+  "description": "FinFlow AI - Financial Process Intelligence & Remediation Platform Backend",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node utils/runSeed.js",
+    "test:api": "node testApi.js",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "start:frontend": "npm --prefix frontend start"
+  },
+  "keywords": [
+    "fintech",
+    "sap",
+    "process-intelligence",
+    "remediation",
+    "ai",
+    "gemini"
+  ],
+  "author": "FinFlow AI Engineering",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "@google/generative-ai": "^0.24.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-async-handler": "^1.2.0",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.1.4"
+  }
+}
