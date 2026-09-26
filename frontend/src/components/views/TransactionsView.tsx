@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Download, ArrowUpRight, ArrowDownLeft, Wallet, UploadCloud } from 'lucide-react';
+import { Download, ArrowUpRight, ArrowDownLeft, Wallet, UploadCloud, AlertTriangle, Trash2 } from 'lucide-react';
 import { useFinFlow } from '../../context/FinFlowContext';
 import { RecentTransactionsTable } from '../dashboard/RecentTransactionsTable';
 import { formatCurrency } from '../../lib/utils';
@@ -14,7 +14,24 @@ export function TransactionsView() {
     selectedProject,
     selectedProjectId,
     setSelectedProjectId,
+    clearAllData,
   } = useFinFlow();
+
+  // Detect broken parse: if >30% of merchant names are a single short word (≤10 chars, no space)
+  // this means the old parser split on spaces — show a re-import warning
+  const hasBrokenNames = React.useMemo(() => {
+    if (transactions.length === 0) return false;
+    const sample = transactions.slice(0, Math.min(20, transactions.length));
+    const brokenCount = sample.filter(
+      (t) => !t.merchant.includes(' ') && t.merchant.length <= 12 && !/record/i.test(t.merchant)
+    ).length;
+    return brokenCount / sample.length > 0.3;
+  }, [transactions]);
+
+  const handleClearAndReimport = () => {
+    clearAllData();
+    setIsImportModalOpen(true);
+  };
 
   const handleExportCSV = () => {
     const headers = ['ID,Merchant,Category,Date,Type,Amount,Status,Note'];
@@ -42,7 +59,34 @@ export function TransactionsView() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Export Actions */}
+
+      {/* ── Broken Data Warning Banner ── */}
+      {hasBrokenNames && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+              <AlertTriangle className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-amber-900">Merchant names look incomplete ("Corp", "Ltd", "Cement"...)</p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                This data was imported with an older parser that split names on spaces.
+                Clear this ledger and re-import your CSV — the new parser preserves full names like <strong>"Power Grid Corp"</strong>, <strong>"Microsoft India Pvt Ltd"</strong>.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleClearAndReimport}
+              className="flex items-center gap-2 rounded-xl bg-amber-700 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-800 transition-colors shadow-sm"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Clear Ledger &amp; Re-import CSV</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl bg-white p-5 sm:p-6 shadow-2xs border border-slate-200/80">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
