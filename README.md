@@ -357,3 +357,4 @@ The production bundle is minified, statically optimized, and ready for high-conc
 ---
 
 © 2026 FinFlow. All rights reserved. Smarter Finance. Faster Flow.
+# finflow
