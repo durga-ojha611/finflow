@@ -25,7 +25,8 @@ Modern enterprise finance and treasury teams spend up to **47% of their working 
 
 ### The FinFlow Solution:
 **FinFlow** provides an end-to-end, high-precision financial intelligence platform with:
-- **Zero-Friction Ingestion**: Drag-and-drop CSV importer that parses 1,000+ invoices in milliseconds with entity/project folder routing.
+- **Clean Slate & Custom Project Workspaces**: Zero forced mock/built-in projects — you create your own entity and operational folders.
+- **Dynamic CSV Ingestion**: Drag-and-drop CSV importer that parses 1,000+ invoices in milliseconds, tagging records directly to your project.
 - **Autonomous Discrepancy Detection**: Instant identification of amount mismatches, duplicate billings, tax variances, and PO number desynchronizations.
 - **1-Click AI Root Cause Remediation**: Automated forensic audit trails powered by Google Gemini (with local fallback heuristics).
 - **Dual-Ledger SAP Synchronization**: Real-time mock ERP integration bridging operational cash flows with general ledger accounting.
@@ -33,9 +34,49 @@ Modern enterprise finance and treasury teams spend up to **47% of their working 
 
 ---
 
+## 🔄 Core User Journey: Project-First CSV Ingestion
+
+FinFlow puts the user in complete control with **zero pre-built dummy projects**. The application starts clean and lets you define your business entity structure:
+
+```mermaid
+graph TD
+    A[Step 1: Create Project Folder] -->|Define Name, Code, Dept & Budget| B[Clean Workspace Created]
+    B --> C[Step 2: Upload CSV Invoices]
+    C -->|Auto-tagging to Project ID| D[Transactions Ingested & Scoped]
+    D --> E[Step 3: All Features Run Dynamically on Your CSV]
+    E --> F[📊 Executive Dashboard & Net Cash Balance]
+    E --> G[🍩 Category Donut & Expense Breakdown]
+    E --> H[📈 Cash Flow Timeline & Burn Rate]
+    E --> I[🛡️ Budget Spend vs Allocated Guardrails]
+    E --> J[🤖 AI Root Cause & Forensic Remediation]
+```
+
+### 1. Zero Pre-built Projects by Default
+- The workspace starts completely clean. No arbitrary sample projects cluttering your view.
+- User-created project folders are persisted securely in your browser's `localStorage`.
+
+### 2. Create Your Entity / Project Folder
+- Navigate to **Project Folders** and click **`+ Create Project Folder`** (or create on-the-fly directly inside the **Import CSV** dialog).
+- Specify:
+  - **Project Name** *(e.g., "Q4 Logistics Expansion", "APAC Cloud Operations")*
+  - **Project Code** *(auto-generated or custom, e.g., "PRJ-LOGIS")*
+  - **Department** *(Operations, Engineering, Finance, Marketing, Sales, HR & Legal)*
+  - **Allocated Budget** *(e.g., ₹25,00,000)*
+
+### 3. Upload CSV into Your Project
+- In the project card, click **"Upload CSV"**. The modal opens with your project automatically selected as the destination workspace.
+- Upload any standard CSV file (or use the built-in 1-click **1,250 Invoices Enterprise Batch** for high-volume load testing).
+- All invoices are tagged specifically to that project's ID.
+
+### 4. Dynamic Feature Execution
+- **Isolated Project Cockpit**: When a project is active, every single chart, card, and metric calculates strictly from that project's invoices.
+- **Consolidated General Ledger**: Switch back to **"All Projects"** anytime to view company-wide totals across all entity folders.
+
+---
+
 ## 📂 Repository Architecture (Monorepo)
 
-FinFlow is organized as a clean, production-grade monorepo separating frontend client logic from backend financial microservices:
+FinFlow is structured as a production-grade monorepo cleanly separating frontend client logic from backend microservices:
 
 ```
 FINFLOW/
@@ -271,7 +312,7 @@ curl -X GET http://localhost:5001/health
 
 ## 📥 Sample CSV Format for Uploads
 
-You can import any custom CSV file. FinFlow's parser automatically detects the following header conventions:
+You can import any custom CSV file. FinFlow's parser automatically detects standard financial column conventions:
 
 ```csv
 Date,Merchant,Category,Type,Amount,Notes
